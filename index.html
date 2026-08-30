@@ -576,6 +576,7 @@ footer b{color:#cfe0ff}
     <h3>🎮 单词大作战 <span class="en">Word Defense — 英语单词是植物，中文僵尸来袭！</span></h3>
     <p style="font-size:14px;color:var(--muted)">中文僵尸从右向左进攻，从下方<b>英文植物卡片</b>中选出正确单词发射子弹消灭它们！<b>选错</b>僵尸会集体逼近，僵尸走到最左会<b>吃掉脑子</b>。脑子被吃光就……你懂的 😈</p>
     <div class="game-bar">
+      <div class="diff-group" id="gameLevels"></div>
       <div class="diff-group" id="gameDiff">
         <button class="diff-btn" data-diff="easy">🟢 简单</button>
         <button class="diff-btn on" data-diff="normal">🟡 一般</button>
@@ -1940,24 +1941,33 @@ const GAME=(function(){
   const cv=$('#gameCanvas'), ctx=cv.getContext('2d');
   const W=640, H=360, ROWS=5, ROW_H=H/ROWS;
   const rowY=r=>r*ROW_H+ROW_H/2;
-  /* 单词库：直接复用 VOCAB（后期加单词即自动扩充关卡） */
-  const WORD_POOL=VOCAB.map(v=>({en:v.en, zh:v.zh}));
+  /* 单词库：每个大关一个数组，后续更新单词往对应数组追加即可 */
+  const WORD_BANK=[
+    VOCAB.map(v=>({en:v.en, zh:v.zh})),   /* 关卡一：现有 22 词 */
+    []                                     /* 关卡二：后续更新单词加这里 */
+  ];
+  const ROUND_SIZE=8;
+  const CN_NUM=['一','二','三','四','五','六','七','八'];
   function buildLevels(){
-    const n=3, per=Math.ceil(WORD_POOL.length/n);
     const lv=[];
-    for(let i=0;i<n;i++){ const w=WORD_POOL.slice(i*per,(i+1)*per); if(w.length) lv.push({name:'第'+(i+1)+'关', words:w}); }
+    WORD_BANK.forEach((words,i)=>{
+      if(!words.length)return;
+      const rounds=[];
+      for(let j=0;j<words.length;j+=ROUND_SIZE) rounds.push(words.slice(j,j+ROUND_SIZE));
+      lv.push({name:'关卡'+CN_NUM[i]+'（'+words.length+'词）', rounds});
+    });
     return lv;
   }
   const LEVELS=buildLevels();
   const DIFF={easy:{speed:.35,spawn:2400,lives:3,label:'🟢 简单'},normal:{speed:.62,spawn:1700,lives:2,label:'🟡 一般'},hard:{speed:1.02,spawn:1000,lives:1,label:'🔴 困难'}};
-  let diff='normal', level=0, running=false, over=false, won=false;
-  let score=0, combo=0, killed=0, total=0;
+  let diff='normal', level=0, round=0, queue=[], running=false, over=false, won=false;
+  let score=0, combo=0;
   let zombies=[], bullets=[], people=[], spawnTimer=null, raf=null;
   function renderPlants(){
     const box=$('#gamePlants'); box.innerHTML='';
     if(zombies.length===0){ box.style.display='none'; return; }
     box.style.display='flex';
-    const pool=LEVELS[level].words.map(w=>w.en);
+    const pool=LEVELS[level].rounds[round].map(w=>w.en);
     const set=new Set();
     zombies.forEach(z=>set.add(z.en));           /* 所有在场僵尸的正确答案都可选 */
     while(set.size<4){ set.add(pool[(Math.random()*pool.length)|0]); }
@@ -1985,16 +1995,16 @@ const GAME=(function(){
       toast('❌ 种错了！扣 10 分，僵尸逼近！');
     }
   }
-  function spawnZombie(){
+  function spawnZombie(w){
     if(!running||over||won)return;
-    const w=LEVELS[level].words[(Math.random()*LEVELS[level].words.length)|0];
     zombies.push({en:w.en, zh:w.zh, x:W+30, y:16+Math.random()*(H-32), hit:false});
     renderPlants();
   }
   function hitZombie(z){
     const i=zombies.indexOf(z); if(i<0)return;
-    zombies.splice(i,1); killed++;
-    if(killed>=total){ winLevel(); } else renderPlants();
+    zombies.splice(i,1);
+    renderPlants();
+    spawnTick();
   }
   function nearestPerson(z){
     let best=null, bd=1e9;
@@ -2011,7 +2021,7 @@ const GAME=(function(){
     won=true; running=false; clearInterval(spawnTimer);
     $('#gameWin').style.display='flex';
     const hasNext=level+1<LEVELS.length;
-    $('#winText').textContent='第'+(level+1)+'关通关！得分 '+score;
+    $('#winText').textContent=LEVELS[level].name+'通关！得分 '+score;
     $('#btnGameNext').textContent=hasNext?'▶ 下一关':'🏆 全部通关，重新开始';
   }
   function gameOver(){
@@ -2019,10 +2029,19 @@ const GAME=(function(){
     $('#gameOver').style.display='flex';
     $('#gameNote').textContent='💀 人都被吃光了… 难度：'+DIFF[diff].label+'。再试一次吧！';
   }
-  function startRound(){
+  function loadRound(){
     const lv=LEVELS[level];
-    total=lv.words.length;
-    score=0; combo=0; killed=0;
+    if(round>=lv.rounds.length){ winLevel(); return; }
+    queue=lv.rounds[round].slice().sort(()=>Math.random()-.5);   /* 每轮单词各出现一次，仅打乱出场顺序 */
+    $('#gameNote').textContent=lv.name+' · 第'+(round+1)+'/'+lv.rounds.length+' 轮 · 难度 '+DIFF[diff].label+' · 保护 '+DIFF[diff].lives+' 人';
+  }
+  function spawnTick(){
+    if(!running||over||won)return;
+    if(queue.length>0){ spawnZombie(queue.shift()); }
+    else if(zombies.length===0){ round++; loadRound(); }
+  }
+  function startRound(){
+    round=0; score=0; combo=0;
     zombies=[]; bullets=[];
     people=[];
     const lanes=[0,1,2,3,4].sort(()=>Math.random()-.5);
@@ -2030,9 +2049,9 @@ const GAME=(function(){
     $('#gameOver').style.display='none'; $('#gameWin').style.display='none';
     running=true; over=false; won=false;
     clearInterval(spawnTimer);
-    spawnTimer=setInterval(spawnZombie, DIFF[diff].spawn);
-    spawnZombie();
-    $('#gameNote').textContent='难度：'+DIFF[diff].label+' · 保护 '+DIFF[diff].lives+' 个人 · 第'+(level+1)+'关（'+lv.name+'）';
+    loadRound();
+    spawnTimer=setInterval(spawnTick, DIFF[diff].spawn);
+    spawnTick();
   }
   function loop(){
     if(running&&!over&&!won){
@@ -2069,7 +2088,7 @@ const GAME=(function(){
     ctx.fillStyle='#14532d'; ctx.font='bold 16px system-ui'; ctx.textAlign='left'; ctx.textBaseline='top';
     ctx.fillText('得分 '+score, 8, 8);
     if(combo>=2){ ctx.fillText('🔥 连击 x'+combo, 8, 30); }
-    ctx.textAlign='right'; ctx.fillText('第'+(level+1)+'关 · '+DIFF[diff].label+' · 剩 '+(total-killed), W-8, 8);
+    ctx.textAlign='right'; ctx.fillText(LEVELS[level].name+' · 第'+(round+1)+'轮 · 剩 '+(queue.length+zombies.length), W-8, 8);
     zombies.forEach(z=>{
       ctx.font='36px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText('🧟', z.x, z.y+4);
@@ -2082,7 +2101,28 @@ const GAME=(function(){
     ctx.fillStyle='#22c55e';
     bullets.forEach(b=>{ ctx.beginPath(); ctx.arc(b.x,b.y,5,0,7); ctx.fill(); });
   }
+  function renderLevels(){
+    const g=$('#gameLevels'); if(!g)return;
+    g.innerHTML='';
+    LEVELS.forEach((lv,i)=>{
+      const b=document.createElement('button');
+      b.className='diff-btn'+(i===0?' on':'');
+      b.textContent=lv.name;
+      b.addEventListener('click',()=>{
+        $$('#gameLevels .diff-btn').forEach(x=>x.classList.remove('on'));
+        b.classList.add('on'); level=i;
+        if(running){ $('#gameNote').textContent='已切换 '+lv.name+'（下一局生效）'; }
+      });
+      g.appendChild(b);
+    });
+    if(LEVELS.length<WORD_BANK.length){
+      const b=document.createElement('button');
+      b.className='diff-btn'; b.disabled=true; b.style.opacity=.5; b.textContent='关卡二（敬请期待）';
+      g.appendChild(b);
+    }
+  }
   function bind(){
+    renderLevels();
     $$('#gameDiff .diff-btn').forEach(b=>b.addEventListener('click',()=>{
       $$('#gameDiff .diff-btn').forEach(x=>x.classList.remove('on'));
       b.classList.add('on'); diff=b.dataset.diff;
@@ -2105,7 +2145,7 @@ const GAME=(function(){
   })();
   raf=requestAnimationFrame(loop);
   bind();
-  window.__GAME={ get running(){return running;}, get lives(){return people.length;}, get score(){return score;}, get level(){return level;}, get diff(){return diff;} };
+  window.__GAME={ get running(){return running;}, get lives(){return people.length;}, get score(){return score;}, get level(){return level;}, get diff(){return diff;}, get round(){return round;}, get rounds(){return LEVELS[level]?LEVELS[level].rounds.length:0;}, get remaining(){return queue.length+zombies.length;} };
   return {};
 })();
 
