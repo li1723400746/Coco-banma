@@ -195,8 +195,8 @@ nav.tabs a .num{font-size:10.5px;opacity:.75;margin-right:4px;font-weight:700}
 .sys-chip.on{border-color:var(--good);background:var(--good-l);transform:translateY(-3px);box-shadow:0 8px 16px rgba(22,163,74,.2)}
 .sys-chip.on .nm{color:var(--good)}
 .sys-chip.off{border-color:#e2e8f0;background:#f8fafc;opacity:.55;filter:grayscale(.6)}
-.engine-box{background:linear-gradient(180deg,#111c33,#0c1526);border-radius:14px;padding:16px;margin-top:14px;position:relative;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#cfe0ff}
-#sysEngineSvg{width:min(300px,80%);height:auto}
+.engine-box{background:linear-gradient(180deg,#111c33,#0c1526);border-radius:14px;padding:20px;margin-top:14px;position:relative;min-height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#cfe0ff}
+#sysEngineSvg{width:min(460px,94%);height:auto}
 .engine-box.running #sysEngineSvg{animation:engineShake .08s linear infinite}
 @keyframes engineShake{0%,100%{transform:translate(0,0)}25%{transform:translate(.6px,-.8px)}75%{transform:translate(-.6px,.7px)}}
 .rpm{font-size:13px;color:#7dd3fc;font-weight:700;letter-spacing:1px;margin-top:8px}
@@ -1181,6 +1181,7 @@ $('#btnAutoTour').addEventListener('click',()=>{
 
 /* ================= 05 发动机系统 ================= */
 function buildSystems(){
+  let running=false,isDiesel=false,rpm=0,rpmInt=null,startTimer=null;
   const grid=$('#sysGrid');
   SYSTEMS.forEach(s=>{
     const d=document.createElement('div'); d.className='sys-chip'; d.dataset.k=s.k;
@@ -1188,21 +1189,53 @@ function buildSystems(){
     d.addEventListener('click',()=>{ $('#sysMsg').innerHTML=`${s.ico} <b>${s.zh} ${s.en}</b>：${s.desc}`; });
     grid.appendChild(d);
   });
-  /* 小发动机 SVG */
+  /* 小发动机 SVG（放大 + 真实曲柄连杆机构联动） */
   const svg=$('#sysEngineSvg');
-  el('rect',{x:70,y:50,width:100,height:90,rx:8,fill:'#1e293b',stroke:'#334155','stroke-width':2},svg);
-  el('rect',{x:82,y:62,width:76,height:66,fill:'#0f172a'},svg);
-  el('rect',{class:'sysPiston',x:88,y:92,width:64,height:22,rx:3,fill:'#e2e8f0',stroke:'#94a3b8'},svg);
-  el('circle',{cx:120,cy:128,r:20,fill:'#475569',stroke:'#94a3b8'},svg);
-  el('circle',{cx:120,cy:112,r:4,fill:'#fbbf24'},svg);
-  el('line',{x1:120,y1:100,x2:120,y2:114,stroke:'#94a3b8','stroke-width':6,'stroke-linecap':'round'},svg);
-  const flyG=el('g',{},svg);
-  el('circle',{cx:120,cy:34,r:18,fill:'#0f172a',stroke:'#94a3b8'},flyG);
-  el('line',{x1:120,y1:34,x2:120,y2:20,stroke:'#fbbf24','stroke-width':2.5},flyG);
-  let flyAng=0;
-  const spinFly=()=>{flyAng=(flyAng+16)%360;flyG.setAttribute('transform','rotate('+flyAng+' 120 34)');};
+  /* 静态：气缸盖、缸体、bore、火花塞、曲轴箱、TDC/BDC 刻度、飞轮 */
+  el('rect',{x:104,y:28,width:112,height:20,rx:4,fill:'#334155',stroke:'#475569'},svg);
+  el('rect',{x:110,y:48,width:100,height:104,rx:6,fill:'#1e293b',stroke:'#334155','stroke-width':2},svg);
+  el('rect',{x:118,y:48,width:84,height:104,fill:'#0f172a'},svg);
+  el('rect',{x:156,y:10,width:8,height:22,rx:2,fill:'#f8fafc',stroke:'#94a3b8'},svg);
+  el('rect',{x:153,y:16,width:14,height:6,rx:1,fill:'#e2e8f0',stroke:'#94a3b8'},svg);
+  el('line',{x1:160,y1:32,x2:160,y2:46,stroke:'#94a3b8','stroke-width':2},svg);
+  el('circle',{cx:160,cy:170,r:58,fill:'none',stroke:'#2a3f6e','stroke-width':2},svg);
+  el('line',{x1:88,y1:50,x2:36,y2:50,stroke:'#38bdf8','stroke-width':1.5},svg);
+  el('text',{x:34,y:54,text:'TDC',fill:'#38bdf8','font-size':9,'text-anchor':'end','font-weight':700},svg);
+  el('line',{x1:88,y1:98,x2:36,y2:98,stroke:'#64748b','stroke-width':1.5},svg);
+  el('text',{x:34,y:102,text:'BDC',fill:'#94a3b8','font-size':9,'text-anchor':'end','font-weight':700},svg);
+  el('circle',{cx:250,cy:120,r:50,fill:'none',stroke:'#4b5b7a','stroke-dasharray':'4 5'},svg);
+  el('circle',{cx:250,cy:120,r:45,fill:'#0f172a',stroke:'#94a3b8','stroke-width':2.5},svg);
+  el('circle',{cx:250,cy:120,r:8,fill:'#475569'},svg);
+  /* 动态组：活塞/连杆/曲柄/曲柄销/飞轮标记 */
+  const dynG=el('g',{},svg);
+  const rodG=el('line',{stroke:'#94a3b8','stroke-width':9,'stroke-linecap':'round'},dynG);
+  const crankArm=el('line',{stroke:'#fbbf24','stroke-width':7,'stroke-linecap':'round'},dynG);
+  el('circle',{cx:160,cy:170,r:30,fill:'#334155',stroke:'#475569'},dynG);
+  const cpin=el('circle',{r:9,fill:'#fbbf24',stroke:'#b45309'},dynG);
+  const pistonG=el('g',{},dynG);
+  el('rect',{x:118,y:0,width:86,height:44,rx:5,fill:'#e2e8f0',stroke:'#94a3b8'},pistonG);
+  el('rect',{x:118,y:3,width:86,height:3,fill:'#94a3b8'},pistonG);
+  el('rect',{x:118,y:9,width:86,height:3,fill:'#94a3b8'},pistonG);
+  el('circle',{cx:161,cy:22,r:6,fill:'#64748b'},pistonG);
+  const flyMark=el('line',{x1:250,y1:120,x2:250,y2:78,stroke:'#fbbf24','stroke-width':3.5,'stroke-linecap':'round'},dynG);
+  /* 真实曲柄连杆机构动画 */
+  const CR_R=24, CR_L=74, CR_CY=170, CR_CX=160;
+  const pinYfn=ang=>CR_CY-CR_R*Math.cos(ang)-Math.sqrt(Math.max(0,CR_L*CR_L-Math.pow(CR_R*Math.sin(ang),2)));
+  let ang=0;
+  (function miniLoop(){
+    if(running) ang+=0.05+(rpm/820)*0.12;
+    const cpx=CR_CX+CR_R*Math.sin(ang), cpy=CR_CY-CR_R*Math.cos(ang);
+    const py=pinYfn(ang), pTop=py-22;
+    pistonG.setAttribute('transform','translate(0,'+pTop+')');
+    rodG.setAttribute('x1',CR_CX); rodG.setAttribute('y1',py);
+    rodG.setAttribute('x2',cpx); rodG.setAttribute('y2',cpy);
+    crankArm.setAttribute('x1',CR_CX); crankArm.setAttribute('y1',CR_CY);
+    crankArm.setAttribute('x2',cpx); crankArm.setAttribute('y2',cpy);
+    cpin.setAttribute('cx',cpx); cpin.setAttribute('cy',cpy);
+    flyMark.setAttribute('transform','rotate('+(ang*180/Math.PI)+' 250 120)');
+    requestAnimationFrame(miniLoop);
+  })();
   /* 启动流程 */
-  let running=false,isDiesel=false,rpm=0,rpmInt=null,startTimer=null;
   const chips=()=>$$('#sysGrid .sys-chip');
   const setRpm=()=>{ $('#rpmText').textContent='RPM '+rpm+(running?' · 怠速运转中':' · 已停机'); };
   const engineBox=$('#engineBox');
@@ -1226,7 +1259,7 @@ function buildSystems(){
         if(isDiesel){ const ig=$('#sysGrid .sys-chip[data-k="ignition"]'); ig.classList.remove('on'); ig.classList.add('off'); }
         $('#sysMsg').innerHTML='✅ <b>发动机启动成功！</b>各系统协同工作，活塞往复运动，动力源源不断输出。';
         rpm=0; clearInterval(rpmInt);
-        rpmInt=setInterval(()=>{ if(running&&rpm<820)rpm+=40; spinFly(); setRpm(); },90);
+        rpmInt=setInterval(()=>{ if(running&&rpm<820)rpm+=40; setRpm(); },90);
         $('#btnStart').disabled=false;
       }
     };
@@ -1235,7 +1268,7 @@ function buildSystems(){
   $('#btnStop').addEventListener('click',()=>{
     running=false; engineBox.classList.remove('running');
     clearInterval(rpmInt);
-    rpmInt=setInterval(()=>{ if(rpm>0)rpm-=60; spinFly(); setRpm(); if(rpm<=0){clearInterval(rpmInt);setRpm();} },90);
+    rpmInt=setInterval(()=>{ if(rpm>0)rpm-=60; setRpm(); if(rpm<=0){clearInterval(rpmInt);setRpm();} },90);
     chips().forEach(c=>c.classList.remove('on','off'));
     $('#sysMsg').innerHTML='⏹ 发动机已熄火。再点"启动发动机"体验一次吧！';
   });
@@ -1715,71 +1748,89 @@ function init3D(){
 function buildEngine3D(box){
   const THREE=window.THREE;
   const W=box.clientWidth||600, H=box.clientHeight||430;
-  const scene=new THREE.Scene();
-  scene.background=new THREE.Color(0x0d1b36);
+  const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0d1b36);
   const camera=new THREE.PerspectiveCamera(45,W/H,0.1,100);
-  camera.position.set(4.2,2.6,5.2);
+  camera.position.set(3.2,2.0,4.4);
   let renderer=null;
   try{ renderer=new THREE.WebGLRenderer({antialias:true}); }
   catch(e){ const n=document.getElementById('threeNote'); if(n)n.textContent='⚠️ 当前设备不支持 3D（WebGL 不可用）。'; return; }
   renderer.setSize(W,H);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-  box.innerHTML='';
-  box.appendChild(renderer.domElement);
-  scene.add(new THREE.AmbientLight(0xffffff,0.55));
-  const dl=new THREE.DirectionalLight(0xffffff,0.9); dl.position.set(6,8,6); scene.add(dl);
-  const dl2=new THREE.DirectionalLight(0x88bbff,0.4); dl2.position.set(-6,-4,-5); scene.add(dl2);
-  const grid=new THREE.GridHelper(8,16,0x2a3f6e,0x1b2b4d); grid.position.y=-1.3; scene.add(grid);
+  renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  box.innerHTML=''; box.appendChild(renderer.domElement);
+  /* 灯光 */
+  scene.add(new THREE.HemisphereLight(0xffffff,0x2a3f6e,0.7));
+  const key=new THREE.DirectionalLight(0xffffff,1.0); key.position.set(5,9,7); scene.add(key);
+  const fill=new THREE.DirectionalLight(0x66aaff,0.45); fill.position.set(-6,-3,-6); scene.add(fill);
+  const rim=new THREE.DirectionalLight(0xffaa66,0.4); rim.position.set(0,2,-8); scene.add(rim);
+  /* 地面 */
+  const grid=new THREE.GridHelper(10,20,0x2a3f6e,0x1b2b4d); grid.position.y=-1.98; scene.add(grid);
+  const floor=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,0.05,48),new THREE.MeshStandardMaterial({color:0x111c33,metalness:.8,roughness:.4}));
+  floor.position.y=-1.95; floor.receiveShadow=true; scene.add(floor);
   const grp=new THREE.Group(); scene.add(grp);
-  const mat=(c,t,o)=>new THREE.MeshStandardMaterial({color:c,transparent:t,opacity:o??1,roughness:.55,metalness:.15});
-  /* 气缸体（半透明外壳） */
-  const block=new THREE.Mesh(new THREE.BoxGeometry(2.6,1.1,1.5),mat(0x2b3a55,true,.72));
-  block.position.y=0.35; grp.add(block);
-  /* 4 个气缸 + 活塞 */
-  const pistons=[];
-  const boreMat=new THREE.MeshStandardMaterial({color:0x0f172a,transparent:true,opacity:.35,side:THREE.DoubleSide});
-  for(let i=0;i<4;i++){
-    const x=-0.9+i*0.6;
-    const bore=new THREE.Mesh(new THREE.CylinderGeometry(0.26,0.26,1.0,24),boreMat);
-    bore.position.set(x,0.35,0); grp.add(bore);
-    const piston=new THREE.Mesh(new THREE.CylinderGeometry(0.23,0.23,0.16,20),mat(0xe2e8f0,false));
-    piston.position.set(x,0.45,0); grp.add(piston);
-    pistons.push(piston);
-  }
+  /* 材质（金属 + 清漆） */
+  const M=(c,opt={})=>new THREE.MeshPhysicalMaterial(Object.assign({color:c,metalness:.75,roughness:.3,clearcoat:.6,clearcoatRoughness:.3},opt));
+  const matAl=M(0xcbd5e1), matAl2=M(0x94a3b8), matGold=M(0xfbbf24,{metalness:.9,roughness:.25});
+  const matBlock=M(0x2b3a55,{metalness:.4,transparent:true,opacity:.85});
+  const matHead=M(0x475569), matDark=M(0x0f172a,{metalness:.5,roughness:.5}), matWhite=M(0xf8fafc,{metalness:.1,roughness:.4});
+  /* 缸体（半透明）+ 4 个气缸 */
+  const block=new THREE.Mesh(new THREE.BoxGeometry(2.6,0.95,1.4),matBlock); block.position.y=-0.9; block.castShadow=true; grp.add(block);
+  const boreMat=new THREE.MeshPhysicalMaterial({color:0x0f172a,metalness:.4,roughness:.4,transparent:true,opacity:.3,side:THREE.DoubleSide});
+  const xs=[-0.9,-0.3,0.3,0.9];
+  xs.forEach(x=>{ const b=new THREE.Mesh(new THREE.CylinderGeometry(0.255,0.255,0.95,28,1,true),boreMat); b.position.set(x,-0.9,0); grp.add(b); });
   /* 气缸盖 + 火花塞 */
-  const head=new THREE.Mesh(new THREE.BoxGeometry(2.6,0.22,1.5),mat(0x475569,false));
-  head.position.y=1.05; grp.add(head);
-  for(let i=0;i<4;i++){
-    const sp=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.35,8),mat(0xf8fafc,false));
-    sp.position.set(-0.9+i*0.6,1.33,0); grp.add(sp);
+  const head=new THREE.Mesh(new THREE.BoxGeometry(2.6,0.2,1.4),matHead); head.position.y=-0.4; head.castShadow=true; grp.add(head);
+  xs.forEach(x=>{ const sp=new THREE.Mesh(new THREE.CylinderGeometry(0.032,0.032,0.32,10),matWhite); sp.position.set(x,-0.22,0); grp.add(sp); });
+  /* 油底壳 + 进/排气歧管 */
+  const pan=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.22,1.2),matHead); pan.position.y=-1.46; grp.add(pan);
+  const intake=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,1.0,12),matAl2); intake.position.set(-1.5,-0.52,0); intake.rotation.z=Math.PI/2.4; grp.add(intake);
+  const exhaust=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,1.0,12),matAl2); exhaust.position.set(1.5,-0.52,0); exhaust.rotation.z=-Math.PI/2.4; grp.add(exhaust);
+  /* 飞轮（右端，随曲轴旋转） */
+  const flyG=new THREE.Group(); flyG.position.set(1.42,0,0); grp.add(flyG);
+  const fly=new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.46,0.09,40),matDark); fly.rotation.z=Math.PI/2; flyG.add(fly);
+  const flyRing=new THREE.Mesh(new THREE.TorusGeometry(0.42,0.028,10,42),matGold); flyRing.position.x=0.07; flyRing.rotation.y=Math.PI/2; flyG.add(flyRing);
+  const flyMark=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.08,0.05),matGold); flyMark.position.set(0.07,0.30,0); flyG.add(flyMark);
+  /* 曲轴：主轴 + 曲柄臂 + 连杆 + 活塞 */
+  const mainShaft=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,2.9,16),matAl2); mainShaft.rotation.z=Math.PI/2; grp.add(mainShaft);
+  const R=0.34, L=0.95;
+  const V3=(x,y,z)=>new THREE.Vector3(x,y,z);
+  const up=new THREE.Vector3(0,1,0), dir=new THREE.Vector3();
+  const pinY=ang=>-R*Math.cos(ang)-Math.sqrt(Math.max(0,L*L-Math.pow(R*Math.sin(ang),2)));
+  function cylBetween(v1,v2,r,mat){
+    const d=new THREE.Vector3().subVectors(v2,v1); const len=d.length();
+    const mesh=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,10),mat);
+    mesh.position.copy(v1).add(v2).multiplyScalar(.5);
+    mesh.quaternion.setFromUnitVectors(up,d.clone().normalize());
+    return mesh;
   }
-  /* 曲轴（金色） + 油底壳 */
-  const crank=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,2.4,16),mat(0xfbbf24,false));
-  crank.rotation.z=Math.PI/2; crank.position.y=-0.72; grp.add(crank);
-  const pan=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.25,1.3),mat(0x475569,false));
-  pan.position.y=-0.98; grp.add(pan);
-  /* 交互：拖拽旋转 + 滚轮缩放 */
-  let ry=0.6, rx=0.25, zoom=1, dragging=false, px=0, py=0;
+  const pistons=[], rods=[], arms=[], pins=[];
+  const PHASE=[0,Math.PI,3*Math.PI,2*Math.PI];
+  xs.forEach((x,i)=>{
+    const piston=new THREE.Mesh(new THREE.CylinderGeometry(0.235,0.235,0.18,22),matAl); piston.castShadow=true; grp.add(piston); pistons.push(piston);
+    const rod=cylBetween(V3(x,-R-L,0),V3(x,-R,0),0.032,matAl2); grp.add(rod); rods.push(rod);
+    const arm=cylBetween(V3(x,0,0),V3(x,-R,0),0.05,matAl2); grp.add(arm); arms.push(arm);
+    const pin=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.15,10),matGold); pin.rotation.z=Math.PI/2; grp.add(pin); pins.push(pin);
+  });
+  /* 交互：拖拽旋转 + 滚轮缩放 + 自动缓慢旋转 */
+  let ry=0.55, rx=0.18, zoom=1, dragging=false, px=0, py=0;
   renderer.domElement.style.cursor='grab';
   renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;renderer.domElement.style.cursor='grabbing';});
-  window.addEventListener('pointermove',e=>{
-    if(!dragging)return;
-    ry+=(e.clientX-px)*0.008; rx+=(e.clientY-py)*0.008;
-    rx=Math.max(-1.2,Math.min(1.2,rx));
-    px=e.clientX;py=e.clientY;
-  });
+  window.addEventListener('pointermove',e=>{ if(!dragging)return; ry+=(e.clientX-px)*0.008; rx+=(e.clientY-py)*0.008; rx=Math.max(-1.3,Math.min(1.3,rx)); px=e.clientX;py=e.clientY; });
   window.addEventListener('pointerup',()=>{dragging=false;renderer.domElement.style.cursor='grab';});
-  renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(0.5,Math.min(2.5,zoom*(e.deltaY>0?1.08:0.93)));},{passive:false});
-  /* 动画循环 */
-  const PHASE=[0,Math.PI,3*Math.PI,2*Math.PI];
+  renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(0.5,Math.min(2.6,zoom*(e.deltaY>0?1.08:0.93)));},{passive:false});
+  /* 动画：真实曲柄连杆联动 + 飞轮旋转 */
   let t=0;
   function loop(){
-    t+=0.02;
-    pistons.forEach((p,i)=>{ p.position.y=0.45+Math.sin(t+PHASE[i])*0.28; });
-    crank.rotation.x=Math.sin(t)*0.6;
+    t+=0.016; const A=t;
+    pistons.forEach((p,i)=>{ const py=pinY(A+PHASE[i]); p.position.set(xs[i],py,0); });
+    rods.forEach((rod,i)=>{ const py=pinY(A+PHASE[i]); const cp=V3(xs[i],-R*Math.cos(A+PHASE[i]),R*Math.sin(A+PHASE[i])); const pp=V3(xs[i],py,0); rod.position.copy(pp).add(cp).multiplyScalar(.5); dir.subVectors(cp,pp); rod.quaternion.setFromUnitVectors(up,dir.clone().normalize()); });
+    arms.forEach((arm,i)=>{ const cp=V3(xs[i],-R*Math.cos(A+PHASE[i]),0); const c0=V3(xs[i],0,0); arm.position.copy(c0).add(cp).multiplyScalar(.5); dir.subVectors(cp,c0); arm.quaternion.setFromUnitVectors(up,dir.clone().normalize()); });
+    pins.forEach((pin,i)=>{ pin.position.set(xs[i],-R*Math.cos(A+PHASE[i]),0); });
+    flyG.rotation.x=A;
+    if(!dragging) ry+=0.0022;
     grp.rotation.y=ry; grp.rotation.x=rx;
-    camera.position.z=5.2*zoom; camera.position.x=4.2*zoom;
-    camera.lookAt(0,0.1,0);
+    camera.position.set(3.2*zoom,2.0*zoom,4.4*zoom);
+    camera.lookAt(0,-0.55,0);
     renderer.render(scene,camera);
     requestAnimationFrame(loop);
   }
