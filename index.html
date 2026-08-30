@@ -313,6 +313,29 @@ footer b{color:#cfe0ff}
   .four-controls{width:100%;justify-content:center}
   .hero .car{width:min(230px,40vw)}
 }
+/* ============ 单词大作战 游戏 ============ */
+.game-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}
+.diff-group{display:flex;gap:8px;flex-wrap:wrap}
+.diff-btn{border:2px solid var(--line);background:#fff;border-radius:10px;padding:8px 14px;font-weight:800;font-size:13px;color:var(--muted);transition:.2s}
+.diff-btn.on{border-color:var(--primary);background:var(--primary);color:#fff}
+.diff-btn[data-diff="easy"].on{background:var(--good);border-color:var(--good)}
+.diff-btn[data-diff="normal"].on{background:var(--accent);border-color:var(--accent)}
+.diff-btn[data-diff="hard"].on{background:var(--bad);border-color:var(--bad)}
+.game-box{position:relative;background:linear-gradient(180deg,#9bd98b,#7cc96b);border-radius:14px;overflow:hidden}
+#gameCanvas{width:100%;height:auto;display:block}
+.game-plants{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:10px;background:rgba(0,0,0,.55)}
+.plant-card{border:2px solid #fff;background:linear-gradient(180deg,#d9f99d,#86efac);color:#14532d;font-weight:800;font-size:15px;padding:8px 16px;border-radius:12px;cursor:pointer;transition:.15s;min-width:80px}
+.plant-card:hover{transform:translateY(-3px);box-shadow:0 6px 12px rgba(0,0,0,.25)}
+.plant-card:active{transform:scale(.95)}
+.plant-card.bad{background:#fecaca;color:#7f1d1d;border-color:#ef4444}
+.game-overlay{position:absolute;inset:0;background:rgba(5,5,10,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10}
+.dead-char{font-size:clamp(80px,20vw,150px);font-weight:900;color:#dc2626;text-shadow:0 0 30px rgba(220,38,38,.8),0 4px 8px rgba(0,0,0,.6);animation:deadIn .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes deadIn{from{transform:scale(3);opacity:0}to{transform:scale(1);opacity:1}}
+.dead-sub{font-size:18px;color:#fca5a5;font-weight:800;letter-spacing:4px}
+.win-char{font-size:90px;animation:deadIn .5s cubic-bezier(.2,1.4,.4,1)}
+.win-sub{font-size:20px;color:#fbbf24;font-weight:800}
+@media(max-width:560px){.plant-card{font-size:13px;padding:6px 12px;min-width:60px}}
+
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -549,6 +572,33 @@ footer b{color:#cfe0ff}
     <div class="sec-num">08</div>
     <h2>闯关练习 · 学完测一测<small>QUIZ — 选择题 + 判断题 · 抽人回答，即时反馈</small></h2>
   </div>
+  <div class="card game-card">
+    <h3>🎮 单词大作战 <span class="en">Word Defense — 英语单词是植物，中文僵尸来袭！</span></h3>
+    <p style="font-size:14px;color:var(--muted)">中文僵尸从右向左进攻，从下方<b>英文植物卡片</b>中选出正确单词发射子弹消灭它们！<b>选错</b>僵尸会集体逼近，僵尸走到最左会<b>吃掉脑子</b>。脑子被吃光就……你懂的 😈</p>
+    <div class="game-bar">
+      <div class="diff-group" id="gameDiff">
+        <button class="diff-btn" data-diff="easy">🟢 简单</button>
+        <button class="diff-btn on" data-diff="normal">🟡 一般</button>
+        <button class="diff-btn" data-diff="hard">🔴 困难</button>
+      </div>
+      <button class="btn" id="btnGameStart">▶ 开始游戏</button>
+    </div>
+    <div id="gameBox" class="game-box">
+      <canvas id="gameCanvas" width="640" height="360"></canvas>
+      <div id="gamePlants" class="game-plants" style="display:none"></div>
+      <div id="gameOver" class="game-overlay" style="display:none">
+        <div class="dead-char">菜</div>
+        <div class="dead-sub">菜就多练</div>
+        <button class="btn warn" id="btnGameRetry">🔄 再来一局</button>
+      </div>
+      <div id="gameWin" class="game-overlay" style="display:none">
+        <div class="win-char">🏆</div>
+        <div class="win-sub" id="winText">通关成功！</div>
+        <button class="btn" id="btnGameNext">▶ 下一关</button>
+      </div>
+    </div>
+    <p class="stage-note" id="gameNote" style="margin-top:10px">选择难度后点「开始游戏」。难度越高僵尸越快、脑子越少。</p>
+  </div>
   <div class="quiz-shell">
     <div class="q-progress"><i id="qBar" style="width:0%"></i></div>
     <div id="quizBox"></div>
@@ -588,20 +638,6 @@ flowchart TB
       </pre>
     </div>
     <div class="tip">💡 <span><b>提示：</b>流程图由 mermaid.js 组件绘制，首次切换需要联网加载组件；加载失败会自动保持经典知识树。</span></div>
-  </div>
-  <div class="card" style="margin-top:18px">
-    <h3>💬 留言讨论 <span class="en">Comments — 登录 GitHub 即可评论</span></h3>
-    <p style="font-size:13.5px;color:var(--muted)">评论保存在本仓库的 Issues 中，永久留存、免备案。若下方没有显示评论区，请先安装 utterances 应用（见下方说明）。</p>
-    <div style="margin-top:8px">
-      <script src="https://utteranc.es/client.js" repo="li1723400746/Coco-banma" issue-term="pathname" label="comment" theme="github-light" crossorigin="anonymous" async></script>
-    </div>
-    <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-d)">📌 如何启用评论区（1 分钟）</summary>
-      <ol style="font-size:13.5px;color:var(--muted);padding-left:20px;line-height:2">
-        <li>打开 <b>https://github.com/apps/utterances</b> → 点绿色 <b>Install</b>（安装）</li>
-        <li>选择仓库 <b>li1723400746/Coco-banma</b>（或选择 Only select repositories 后勾选它）→ Install</li>
-        <li>回到本页刷新，评论区即可用；用 GitHub 账号登录后留言</li>
-      </ol>
-    </details>
   </div>
   <footer>
     <p><b>汽车专业英语 · 发动机基本概念与运行原理</b> — 交互式双语动画课程</p>
@@ -1898,6 +1934,165 @@ function buildMindmap(){
   });
   show(TREE);
 }
+
+/* ================= 单词大作战 2D 小游戏 ================= */
+const GAME=(function(){
+  const cv=$('#gameCanvas'), ctx=cv.getContext('2d');
+  const W=640, H=360, ROWS=5, ROW_H=H/ROWS;
+  const rowY=r=>r*ROW_H+ROW_H/2;
+  /* 单词库：直接复用 VOCAB（后期加单词即自动扩充关卡） */
+  const WORD_POOL=VOCAB.map(v=>({en:v.en, zh:v.zh}));
+  function buildLevels(){
+    const n=3, per=Math.ceil(WORD_POOL.length/n);
+    const lv=[];
+    for(let i=0;i<n;i++){ const w=WORD_POOL.slice(i*per,(i+1)*per); if(w.length) lv.push({name:'第'+(i+1)+'关', words:w}); }
+    return lv;
+  }
+  const LEVELS=buildLevels();
+  const DIFF={easy:{speed:.35,spawn:2400,lives:3,label:'🟢 简单'},normal:{speed:.62,spawn:1700,lives:2,label:'🟡 一般'},hard:{speed:1.02,spawn:1000,lives:1,label:'🔴 困难'}};
+  let diff='normal', level=0, running=false, over=false, won=false;
+  let lives=3, score=0, combo=0, killed=0, total=0;
+  let zombies=[], bullets=[], spawnTimer=null, raf=null;
+  function renderPlants(){
+    const box=$('#gamePlants'); box.innerHTML='';
+    if(zombies.length===0){ box.style.display='none'; return; }
+    box.style.display='flex';
+    const pool=LEVELS[level].words.map(w=>w.en);
+    const set=new Set();
+    zombies.forEach(z=>set.add(z.en));           /* 所有在场僵尸的正确答案都可选 */
+    while(set.size<4){ set.add(pool[(Math.random()*pool.length)|0]); }
+    const arr=[...set].sort(()=>Math.random()-.5);
+    arr.forEach(en=>{
+      const b=document.createElement('button');
+      b.className='plant-card'; b.textContent=en;
+      b.addEventListener('click',()=>onPlantClick(en,b));
+      box.appendChild(b);
+    });
+  }
+  function onPlantClick(en,btn){
+    if(!running||over||won)return;
+    const idx=zombies.findIndex(z=>z.en===en);
+    if(idx>=0){
+      const z=zombies[idx];
+      bullets.push({x:W/2,y:H-10,z});
+      combo++; score+=10+Math.min(combo,10)*2;
+      btn.style.background='#86efac';
+    }else{
+      combo=0;
+      zombies.forEach(z=>z.x-=90);
+      btn.classList.add('bad');
+      setTimeout(()=>{ if(btn&&btn.parentNode) btn.parentNode.removeChild(btn); },180);
+      toast('❌ 种错了！僵尸集体逼近！');
+    }
+  }
+  function spawnZombie(){
+    if(!running||over||won)return;
+    const w=LEVELS[level].words[(Math.random()*LEVELS[level].words.length)|0];
+    const row=(Math.random()*ROWS)|0;
+    zombies.push({en:w.en, zh:w.zh, row, x:W+30, hit:false});
+    renderPlants();
+  }
+  function hitZombie(z){
+    const i=zombies.indexOf(z); if(i<0)return;
+    zombies.splice(i,1); killed++;
+    if(killed>=total){ winLevel(); } else renderPlants();
+  }
+  function eatBrain(z){
+    const i=zombies.indexOf(z); if(i<0)return;
+    zombies.splice(i,1); lives--; combo=0;
+    if(lives<=0){ gameOver(); } else renderPlants();
+  }
+  function winLevel(){
+    won=true; running=false; clearInterval(spawnTimer);
+    $('#gameWin').style.display='flex';
+    const hasNext=level+1<LEVELS.length;
+    $('#winText').textContent='第'+(level+1)+'关通关！得分 '+score;
+    $('#btnGameNext').textContent=hasNext?'▶ 下一关':'🏆 全部通关，重新开始';
+  }
+  function gameOver(){
+    over=true; running=false; clearInterval(spawnTimer);
+    $('#gameOver').style.display='flex';
+    $('#gameNote').textContent='💀 脑子被吃光了… 难度：'+DIFF[diff].label+'。再试一次吧！';
+  }
+  function startRound(){
+    const lv=LEVELS[level];
+    total=lv.words.length;
+    lives=DIFF[diff].lives; score=0; combo=0; killed=0;
+    zombies=[]; bullets=[];
+    $('#gameOver').style.display='none'; $('#gameWin').style.display='none';
+    running=true; over=false; won=false;
+    clearInterval(spawnTimer);
+    spawnTimer=setInterval(spawnZombie, DIFF[diff].spawn);
+    spawnZombie();
+    $('#gameNote').textContent='难度：'+DIFF[diff].label+' · 脑子 🧠×'+lives+' · 第'+(level+1)+'关（'+lv.name+'）';
+  }
+  function loop(){
+    if(running&&!over&&!won){
+      zombies.forEach(z=>{ if(!z.hit) z.x-=DIFF[diff].speed; });
+      zombies.filter(z=>z.x<=14).forEach(z=>eatBrain(z));
+      const dead=[];
+      bullets.forEach(b=>{
+        if(b.z.hit){ dead.push(b); return; }
+        const tx=b.z.x, ty=rowY(b.z.row);
+        const dx=tx-b.x, dy=ty-b.y, d=Math.hypot(dx,dy)||1;
+        b.x+=dx/d*9; b.y+=dy/d*9;
+        if(Math.hypot(b.x-tx,b.y-ty)<14) dead.push(b);
+      });
+      dead.forEach(b=>{ if(!b.z.hit){ b.z.hit=true; hitZombie(b.z); } });
+      bullets=bullets.filter(b=>!dead.includes(b));
+      draw();
+    }
+    raf=requestAnimationFrame(loop);
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(let r=0;r<ROWS;r++){ ctx.fillStyle=r%2?'#8ed07a':'#9cdb89'; ctx.fillRect(0,r*ROW_H,W,ROW_H); }
+    ctx.strokeStyle='rgba(255,255,255,.22)'; ctx.lineWidth=1;
+    for(let r=1;r<ROWS;r++){ ctx.beginPath(); ctx.moveTo(0,r*ROW_H); ctx.lineTo(W,r*ROW_H); ctx.stroke(); }
+    for(let i=0;i<lives;i++){ ctx.font='26px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🧠', 26, 26+i*32); }
+    ctx.fillStyle='#14532d'; ctx.font='bold 16px system-ui'; ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText('得分 '+score, 52, 8);
+    if(combo>=2){ ctx.fillText('🔥 连击 x'+combo, 52, 30); }
+    ctx.textAlign='right'; ctx.fillText('第'+(level+1)+'关 · '+DIFF[diff].label+' · 剩 '+(total-killed), W-12, 8);
+    zombies.forEach(z=>{
+      const y=rowY(z.row);
+      ctx.font='36px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('🧟', z.x, y+4);
+      ctx.font='bold 14px system-ui';
+      const tw=ctx.measureText(z.zh).width;
+      ctx.fillStyle='rgba(255,255,255,.92)';
+      ctx.fillRect(z.x-tw/2-6, y-30, tw+12, 21);
+      ctx.fillStyle='#111827'; ctx.fillText(z.zh, z.x, y-19);
+    });
+    ctx.fillStyle='#22c55e';
+    bullets.forEach(b=>{ ctx.beginPath(); ctx.arc(b.x,b.y,5,0,7); ctx.fill(); });
+  }
+  function bind(){
+    $$('#gameDiff .diff-btn').forEach(b=>b.addEventListener('click',()=>{
+      $$('#gameDiff .diff-btn').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on'); diff=b.dataset.diff;
+      if(running){ $('#gameNote').textContent='难度已切换为 '+DIFF[diff].label+'（下一局生效）'; }
+    }));
+    $('#btnGameStart').addEventListener('click',()=>{ level=0; startRound(); $('#btnGameStart').textContent='🔄 重新开始'; });
+    $('#btnGameRetry').addEventListener('click',()=>{ startRound(); });
+    $('#btnGameNext').addEventListener('click',()=>{
+      if(level+1<LEVELS.length){ level++; startRound(); }
+      else{ level=0; startRound(); }
+    });
+  }
+  (function init(){
+    ctx.fillStyle='#7cc96b'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(255,255,255,.9)'; ctx.font='bold 22px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('🎮 点击上方「开始游戏」', W/2, H/2-12);
+    ctx.font='15px system-ui'; ctx.fillStyle='rgba(255,255,255,.75)';
+    ctx.fillText('选对英文植物 → 消灭中文僵尸！', W/2, H/2+20);
+    ctx.textAlign='left'; ctx.textBaseline='top';
+  })();
+  raf=requestAnimationFrame(loop);
+  bind();
+  window.__GAME={ get running(){return running;}, get lives(){return lives;}, get score(){return score;}, get level(){return level;}, get diff(){return diff;} };
+  return {};
+})();
 
 /* ================= 初始化 ================= */
 buildExplode();
