@@ -109,6 +109,7 @@ nav.tabs a .num{font-size:10.5px;opacity:.75;margin-right:4px;font-weight:700}
 .btn:hover{background:var(--primary-d);transform:translateY(-1px)}
 .btn.ghost{background:#fff;color:var(--primary-d);border:1.5px solid var(--primary);box-shadow:none}
 .btn.ghost:hover{background:var(--primary-l)}
+.btn.act{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 6px 14px rgba(37,99,235,.3)}
 .btn.warn{background:var(--power)}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .center{text-align:center}
@@ -460,6 +461,15 @@ footer b{color:#cfe0ff}
     </div>
     <div class="stage-note">💡 爆炸图（Exploded View）：把装配好的发动机沿轴向"拆散"展示，能清楚看到每个零件的位置关系与名称。</div>
   </div>
+  <div class="card" style="margin-top:16px">
+    <h3>🧊 3D 发动机探索 <span class="en">3D Engine — 拖拽旋转 · 滚轮缩放 · 活塞自动往复</span></h3>
+    <p style="font-size:14px;color:var(--muted)">用 three.js 绘制的程序化 3D 发动机（直列四缸）：用鼠标<b>拖拽旋转</b>、<b>滚轮缩放</b>，活塞会像真实发动机一样往复运动。</p>
+    <div class="center" style="margin-top:10px">
+      <button class="btn" id="btn3D">▶ 加载 3D 模型</button>
+    </div>
+    <div id="threeBox" style="display:none;height:430px;border-radius:14px;overflow:hidden;background:#0d1b36;margin-top:12px;position:relative"></div>
+    <p class="stage-note" id="threeNote" style="margin-top:10px">点击按钮后加载 three.js 组件（需联网），加载失败会给出提示，不影响其他功能。</p>
+  </div>
 </div></section>
 
 <!-- ========== 05 发动机系统（第 5 页） ========== -->
@@ -552,15 +562,52 @@ footer b{color:#cfe0ff}
     <div class="sec-num">09</div>
     <h2>总结 · 知识树思维导图<small>KNOWLEDGE TREE — 点击节点查看要点</small></h2>
   </div>
+  <div class="center" style="margin:0 0 14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <button class="btn ghost act" id="btnMindClassic" onclick="mindMode('classic')">🌳 经典知识树</button>
+    <button class="btn ghost" id="btnMindMermaid" onclick="mindMode('mermaid')">📊 流程图模式（mermaid）</button>
+  </div>
+  <div id="mindClassic">
   <div class="mind-wrap">
     <div class="mind-scroll"><svg id="mindSvg" viewBox="0 0 1000 760"></svg></div>
     <div class="mind-detail" id="mindDetail">
       <div class="hint">👆 点击思维导图中的任意节点，这里会显示对应的中英双语要点。</div>
     </div>
   </div>
+  </div>
+  <div id="mindMermaid" style="display:none">
+    <div class="card">
+      <h3>📊 流程图模式 <span class="en">Mermaid Flowchart</span></h3>
+      <pre class="mermaid">
+flowchart TB
+  E["🏎️ 发动机 Engine"]
+  E --> C1["💡 基本概念"] --> C1a["汽油机 = 火花点燃<br/>柴油机 = 压缩自燃（无点火系统）"]
+  E --> C2["🧩 16 个零部件"] --> C2a["进气管 · 节流阀 · 气缸盖 · 气缸<br/>气缸体 · 飞轮 · 气缸套 · 活塞 · 油底壳<br/>曲轴 · 同步带轮 · 曲轴带轮 · 正时带<br/>凸轮轴 · 正时带护罩 · 火花塞"]
+  E --> C3["⚙️ 五大系统"] --> C3a["燃油系统 · 冷却系统 · 润滑系统<br/>点火系统 · 起动系统"]
+  E --> C4["🧱 气缸排列"] --> C4a["直列式 Inline<br/>V 型 V-type（60° 或 90°）<br/>水平对置（180°）"]
+  E --> C5["🔄 四冲程循环"] --> C5a["进气 → 压缩 → 做功 → 排气<br/>一个循环曲轴转 720°"]
+      </pre>
+    </div>
+    <div class="tip">💡 <span><b>提示：</b>流程图由 mermaid.js 组件绘制，首次切换需要联网加载组件；加载失败会自动保持经典知识树。</span></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <h3>💬 留言讨论 <span class="en">Comments — 登录 GitHub 即可评论</span></h3>
+    <p style="font-size:13.5px;color:var(--muted)">评论保存在本仓库的 Issues 中，永久留存、免备案。若下方没有显示评论区，请先安装 utterances 应用（见下方说明）。</p>
+    <div style="margin-top:8px">
+      <script src="https://utteranc.es/client.js" repo="li1723400746/Coco-banma" issue-term="pathname" label="comment" theme="github-light" crossorigin="anonymous" async></script>
+    </div>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-d)">📌 如何启用评论区（1 分钟）</summary>
+      <ol style="font-size:13.5px;color:var(--muted);padding-left:20px;line-height:2">
+        <li>打开 <b>https://github.com/apps/utterances</b> → 点绿色 <b>Install</b>（安装）</li>
+        <li>选择仓库 <b>li1723400746/Coco-banma</b>（或选择 Only select repositories 后勾选它）→ Install</li>
+        <li>回到本页刷新，评论区即可用；用 GitHub 账号登录后留言</li>
+      </ol>
+    </details>
+  </div>
   <footer>
     <p><b>汽车专业英语 · 发动机基本概念与运行原理</b> — 交互式双语动画课程</p>
     <p style="margin-top:4px">Engine is called the "heart" of an automobile. ❤️ 发动机被称为汽车的"心脏"</p>
+    <p style="margin-top:10px;font-size:12.5px;color:#7f9bd0">👥 本站访客 <span id="busuanzi_value_site_uv"></span> 人 · 累计浏览 <span id="busuanzi_value_site_pv"></span> 次</p>
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
   </footer>
 </div>
 </section>
@@ -604,13 +651,27 @@ function _stopAudio(){
   if(_curAudio){ try{_curAudio.pause();}catch(e){} _curAudio=null; }
   if(_speakingBtn){ _speakingBtn.classList.remove('speaking'); _speakingBtn=null; }
 }
+/* 单词音频文件名映射（本地高清音频，edge-tts 生成） */
+const AUDIO_MAP={engine:'engine',automobile:'automobile',component:'component',system:'system',fuel:'fuel',cylinder:'cylinder',piston:'piston',stroke:'stroke',position:'position',bottom:'bottom',ignition:'ignition',lubrication:'lubrication','intake stroke':'intake-stroke',compression:'compression','power stroke':'power-stroke','exhaust stroke':'exhaust-stroke','inlet valve':'inlet-valve','exhaust valve':'exhaust-valve','V-type':'v-type',horizontally:'horizontally',operate:'operate',continuously:'continuously'};
+/* 本地高清发音（edge-tts 美音）→ 失败自动回退有道 → 再失败回退系统语音 */
+function playLocal(text,btn){
+  const slug=AUDIO_MAP[text];
+  if(!slug)return false;
+  const a=new Audio('audio/'+slug+'.mp3');
+  _curAudio=a; _speakingBtn=btn;
+  if(btn)btn.classList.add('speaking');
+  a.onerror=()=>{ _stopAudio(); playYoudao(text,btn); };
+  a.onended=()=>{ _stopAudio(); };
+  a.play().catch(()=>{ _stopAudio(); playYoudao(text,btn); });
+  return true;
+}
 /* 在线发音：有道词典真人发音（标准美音），桌面/手机通用、不受 iOS 静音键影响 */
 function playYoudao(text,btn){
   _stopAudio();
   const a=new Audio('https://dict.youdao.com/dictvoice?audio='+encodeURIComponent(text)+'&type=2');
   _curAudio=a; _speakingBtn=btn;
   if(btn)btn.classList.add('speaking');
-  a.onerror=()=>{ _stopAudio(); toast('在线发音失败，已改用系统发音'); ttsSpeak(text,btn); };
+  a.onerror=()=>{ _stopAudio(); toast('发音失败，已改用系统语音'); ttsSpeak(text,btn); };
   a.onended=()=>{ _stopAudio(); };
   a.play().catch(()=>{ _stopAudio(); ttsSpeak(text,btn); });
 }
@@ -630,12 +691,13 @@ function ttsSpeak(text,btn){
   }catch(e){ _stopAudio(); }
 }
 function speak(text,lang,btn){
-  playYoudao(text,btn);
+  if(!playLocal(text,btn)){ playYoudao(text,btn); }
 }
 function bindSpeak(btn,text,lang){
+  btn.dataset.t=text; btn.dataset.l=lang||'en-US';
   btn.addEventListener('click',e=>{
     e.stopPropagation();
-    speak(text,lang,btn);
+    speak(btn.dataset.t,btn.dataset.l,btn);
   });
 }
 
@@ -1576,6 +1638,168 @@ function buildQuiz(){
 }
 
 /* ================= 09 思维导图 ================= */
+/* mermaid 流程图模式 */
+const MERMAID_CDNS=[
+  'https://cdn.staticfile.org/mermaid/10.9.1/mermaid.min.js',
+  'https://cdn.bootcdn.net/ajax/libs/mermaid/10.9.1/mermaid.min.js',
+  'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js'
+];
+function loadMermaid(){
+  return new Promise(res=>{
+    if(window.mermaid){ res(true); return; }
+    let i=0;
+    const tryNext=()=>{
+      if(i>=MERMAID_CDNS.length){ res(false); return; }
+      const s=document.createElement('script');
+      s.src=MERMAID_CDNS[i++];
+      s.onload=()=>{ if(window.mermaid){ mermaid.initialize({startOnLoad:false,theme:'neutral',securityLevel:'loose'}); res(true);} else res(false); };
+      s.onerror=tryNext;
+      document.head.appendChild(s);
+    };
+    tryNext();
+  });
+}
+function mindMode(m){
+  const cls=document.getElementById('mindClassic'), mer=document.getElementById('mindMermaid');
+  if(!cls||!mer)return;
+  if(m==='mermaid'){
+    cls.style.display='none'; mer.style.display='';
+    document.getElementById('btnMindClassic').classList.remove('act');
+    document.getElementById('btnMindMermaid').classList.add('act');
+    loadMermaid().then(ok=>{
+      if(ok&&window.mermaid){
+        try{ document.querySelectorAll('#mindMermaid .mermaid').forEach(e=>e.removeAttribute('data-processed')); mermaid.run({nodes:[document.querySelector('#mindMermaid .mermaid')]}); }catch(err){}
+      }else{ toast('流程图组件加载失败（网络原因），已保持经典知识树'); }
+    });
+  }else{
+    cls.style.display=''; mer.style.display='none';
+    document.getElementById('btnMindMermaid').classList.remove('act');
+    document.getElementById('btnMindClassic').classList.add('act');
+  }
+}
+/* ---------- 3D 发动机（three.js，程序化模型，多 CDN + 失败回退） ---------- */
+const THREE_CDNS=[
+  'https://cdn.staticfile.org/three.js/0.152.0/three.min.js',
+  'https://cdn.bootcdn.net/ajax/libs/three.js/0.152.0/three.min.js',
+  'https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.min.js'
+];
+function loadThree(){
+  return new Promise(res=>{
+    if(window.THREE){ res(true); return; }
+    let i=0;
+    const tryNext=()=>{
+      if(i>=THREE_CDNS.length){ res(false); return; }
+      const s=document.createElement('script');
+      s.src=THREE_CDNS[i++];
+      s.onload=()=>res(!!window.THREE);
+      s.onerror=tryNext;
+      document.head.appendChild(s);
+    };
+    tryNext();
+  });
+}
+let threeInited=false;
+function init3D(){
+  const box=document.getElementById('threeBox'), note=document.getElementById('threeNote');
+  if(!box)return;
+  box.style.display='';
+  note.textContent='正在加载 three.js 组件…';
+  loadThree().then(ok=>{
+    if(!ok){ note.textContent='⚠️ 3D 组件加载失败（网络原因），可稍后重试；不影响其他功能。'; box.style.display='none'; threeInited=false; const b=document.getElementById('btn3D'); b.disabled=false; b.textContent='▶ 加载 3D 模型'; return; }
+    note.textContent='🖱️ 拖拽旋转 · 滚轮缩放 · 活塞自动往复';
+    const b=document.getElementById('btn3D');
+    b.disabled=false; b.textContent='🙈 隐藏 3D';
+    buildEngine3D(box);
+  });
+}
+function buildEngine3D(box){
+  const THREE=window.THREE;
+  const W=box.clientWidth||600, H=box.clientHeight||430;
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0d1b36);
+  const camera=new THREE.PerspectiveCamera(45,W/H,0.1,100);
+  camera.position.set(4.2,2.6,5.2);
+  let renderer=null;
+  try{ renderer=new THREE.WebGLRenderer({antialias:true}); }
+  catch(e){ const n=document.getElementById('threeNote'); if(n)n.textContent='⚠️ 当前设备不支持 3D（WebGL 不可用）。'; return; }
+  renderer.setSize(W,H);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  box.innerHTML='';
+  box.appendChild(renderer.domElement);
+  scene.add(new THREE.AmbientLight(0xffffff,0.55));
+  const dl=new THREE.DirectionalLight(0xffffff,0.9); dl.position.set(6,8,6); scene.add(dl);
+  const dl2=new THREE.DirectionalLight(0x88bbff,0.4); dl2.position.set(-6,-4,-5); scene.add(dl2);
+  const grid=new THREE.GridHelper(8,16,0x2a3f6e,0x1b2b4d); grid.position.y=-1.3; scene.add(grid);
+  const grp=new THREE.Group(); scene.add(grp);
+  const mat=(c,t,o)=>new THREE.MeshStandardMaterial({color:c,transparent:t,opacity:o??1,roughness:.55,metalness:.15});
+  /* 气缸体（半透明外壳） */
+  const block=new THREE.Mesh(new THREE.BoxGeometry(2.6,1.1,1.5),mat(0x2b3a55,true,.72));
+  block.position.y=0.35; grp.add(block);
+  /* 4 个气缸 + 活塞 */
+  const pistons=[];
+  const boreMat=new THREE.MeshStandardMaterial({color:0x0f172a,transparent:true,opacity:.35,side:THREE.DoubleSide});
+  for(let i=0;i<4;i++){
+    const x=-0.9+i*0.6;
+    const bore=new THREE.Mesh(new THREE.CylinderGeometry(0.26,0.26,1.0,24),boreMat);
+    bore.position.set(x,0.35,0); grp.add(bore);
+    const piston=new THREE.Mesh(new THREE.CylinderGeometry(0.23,0.23,0.16,20),mat(0xe2e8f0,false));
+    piston.position.set(x,0.45,0); grp.add(piston);
+    pistons.push(piston);
+  }
+  /* 气缸盖 + 火花塞 */
+  const head=new THREE.Mesh(new THREE.BoxGeometry(2.6,0.22,1.5),mat(0x475569,false));
+  head.position.y=1.05; grp.add(head);
+  for(let i=0;i<4;i++){
+    const sp=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.35,8),mat(0xf8fafc,false));
+    sp.position.set(-0.9+i*0.6,1.33,0); grp.add(sp);
+  }
+  /* 曲轴（金色） + 油底壳 */
+  const crank=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,2.4,16),mat(0xfbbf24,false));
+  crank.rotation.z=Math.PI/2; crank.position.y=-0.72; grp.add(crank);
+  const pan=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.25,1.3),mat(0x475569,false));
+  pan.position.y=-0.98; grp.add(pan);
+  /* 交互：拖拽旋转 + 滚轮缩放 */
+  let ry=0.6, rx=0.25, zoom=1, dragging=false, px=0, py=0;
+  renderer.domElement.style.cursor='grab';
+  renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;renderer.domElement.style.cursor='grabbing';});
+  window.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    ry+=(e.clientX-px)*0.008; rx+=(e.clientY-py)*0.008;
+    rx=Math.max(-1.2,Math.min(1.2,rx));
+    px=e.clientX;py=e.clientY;
+  });
+  window.addEventListener('pointerup',()=>{dragging=false;renderer.domElement.style.cursor='grab';});
+  renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(0.5,Math.min(2.5,zoom*(e.deltaY>0?1.08:0.93)));},{passive:false});
+  /* 动画循环 */
+  const PHASE=[0,Math.PI,3*Math.PI,2*Math.PI];
+  let t=0;
+  function loop(){
+    t+=0.02;
+    pistons.forEach((p,i)=>{ p.position.y=0.45+Math.sin(t+PHASE[i])*0.28; });
+    crank.rotation.x=Math.sin(t)*0.6;
+    grp.rotation.y=ry; grp.rotation.x=rx;
+    camera.position.z=5.2*zoom; camera.position.x=4.2*zoom;
+    camera.lookAt(0,0.1,0);
+    renderer.render(scene,camera);
+    requestAnimationFrame(loop);
+  }
+  loop();
+  window.addEventListener('resize',()=>{ const w=box.clientWidth,h=box.clientHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); });
+}
+document.getElementById('btn3D').addEventListener('click',()=>{
+  const btn=document.getElementById('btn3D');
+  if(threeInited){
+    const box=document.getElementById('threeBox');
+    const hidden=box.style.display==='none';
+    box.style.display=hidden?'':'none';
+    btn.textContent=hidden?'🙈 隐藏 3D':'🔄 显示 3D';
+    return;
+  }
+  threeInited=true;
+  btn.disabled=true; btn.textContent='⏳ 加载中…';
+  init3D();
+});
+
 function buildMindmap(){
   const svg=$('#mindSvg'); svg.innerHTML='';
   const NODE_W={0:200,1:150,2:108};
