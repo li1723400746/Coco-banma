@@ -2139,8 +2139,9 @@ const GAME=(function(){
     box.style.display='flex';
     const pool=LEVELS[level].rounds[round].map(w=>w.en);
     const set=new Set();
-    zombies.forEach(z=>set.add(z.en));           /* 所有在场僵尸的正确答案都可选 */
-    while(set.size<4){ set.add(pool[(Math.random()*pool.length)|0]); }
+    zombies.forEach(z=>set.add(z.en));           /* 每只僵尸一个正确答案 */
+    const total=Math.max(4, Math.min(zombies.length*4, pool.length));   /* 1只=4选项，2只=8选项 */
+    while(set.size<total){ set.add(pool[(Math.random()*pool.length)|0]); }
     const arr=[...set].sort(()=>Math.random()-.5);
     arr.forEach(en=>{
       const b=document.createElement('button');
@@ -2158,23 +2159,26 @@ const GAME=(function(){
       combo++; score+=10+Math.min(combo,10)*2;
       btn.style.background='#86efac';
     }else{
-      combo=0; score-=10;
+      combo=0; score-=20;
       zombies.forEach(z=>z.x-=90);
       btn.classList.add('bad');
       setTimeout(()=>{ if(btn&&btn.parentNode) btn.parentNode.removeChild(btn); },180);
-      toast('❌ 种错了！扣 10 分，僵尸逼近！');
+      toast('❌ 种错了！扣 20 分，僵尸逼近！');
     }
   }
   function spawnZombie(w){
     if(!running||over||won)return;
-    zombies.push({en:w.en, zh:w.zh, x:W+30, y:16+Math.random()*(H-32), hit:false});
+    const z={en:w.en, zh:w.zh, x:W+30, y:16+Math.random()*(H-32), hit:false};
+    const p=nearestPerson(z);
+    z.d0=p?Math.hypot(p.x-z.x,p.y-z.y):W;   /* 记录出生时到人的距离，用于"走 2/3 刷下一只" */
+    zombies.push(z);
     renderPlants();
   }
   function hitZombie(z){
     const i=zombies.indexOf(z); if(i<0)return;
     zombies.splice(i,1);
     renderPlants();
-    spawnTick();
+    maybeSpawn(); checkProgress();
   }
   function nearestPerson(z){
     let best=null, bd=1e9;
@@ -2185,7 +2189,7 @@ const GAME=(function(){
     if(p) people=people.filter(x=>x!==p);
     const i=zombies.indexOf(z); if(i>=0) zombies.splice(i,1);
     combo=0;
-    if(people.length<=0){ gameOver(); } else renderPlants();
+    if(people.length<=0){ gameOver(); } else { renderPlants(); maybeSpawn(); checkProgress(); }
   }
   function winLevel(){
     won=true; running=false; clearInterval(spawnTimer);
@@ -2205,10 +2209,19 @@ const GAME=(function(){
     queue=lv.rounds[round].slice().sort(()=>Math.random()-.5);   /* 每轮单词各出现一次，仅打乱出场顺序 */
     $('#gameNote').textContent=lv.name+' · 第'+(round+1)+'/'+lv.rounds.length+' 轮 · 难度 '+DIFF[diff].label+' · 保护 '+DIFF[diff].lives+' 人';
   }
-  function spawnTick(){
+  const MAX_ZOMBIES=2;
+  function maybeSpawn(){
     if(!running||over||won)return;
-    if(queue.length>0){ spawnZombie(queue.shift()); }
-    else if(zombies.length===0){ round++; loadRound(); }
+    if(queue.length===0)return;
+    const n=zombies.length;
+    if(n>=MAX_ZOMBIES)return;
+    if(n===0){ spawnZombie(queue.shift()); return; }
+    const z=zombies[0];
+    const p=nearestPerson(z);
+    if(p){ const d=Math.hypot(p.x-z.x,p.y-z.y); if(d<=z.d0/3){ spawnZombie(queue.shift()); } }
+  }
+  function checkProgress(){
+    if(queue.length===0 && zombies.length===0){ round++; loadRound(); }
   }
   function startRound(){
     round=0; score=0; combo=0;
@@ -2218,10 +2231,8 @@ const GAME=(function(){
     for(let i=0;i<DIFF[diff].lives;i++){ people.push({x:28+Math.random()*80, y:rowY(lanes[i%lanes.length])}); }
     $('#gameOver').style.display='none'; $('#gameWin').style.display='none';
     running=true; over=false; won=false;
-    clearInterval(spawnTimer);
     loadRound();
-    spawnTimer=setInterval(spawnTick, DIFF[diff].spawn);
-    spawnTick();
+    maybeSpawn();
   }
   function loop(){
     if(running&&!over&&!won){
@@ -2234,6 +2245,7 @@ const GAME=(function(){
           if(d<20){ z.hit=true; eatPerson(z,p); }
         }
       });
+      maybeSpawn();
       const dead=[];
       bullets.forEach(b=>{
         if(b.z.hit){ dead.push(b); return; }
@@ -2315,7 +2327,7 @@ const GAME=(function(){
   })();
   raf=requestAnimationFrame(loop);
   bind();
-  window.__GAME={ get running(){return running;}, get lives(){return people.length;}, get score(){return score;}, get level(){return level;}, get diff(){return diff;}, get round(){return round;}, get rounds(){return LEVELS[level]?LEVELS[level].rounds.length:0;}, get remaining(){return queue.length+zombies.length;} };
+  window.__GAME={ get running(){return running;}, get lives(){return people.length;}, get score(){return score;}, get level(){return level;}, get diff(){return diff;}, get round(){return round;}, get rounds(){return LEVELS[level]?LEVELS[level].rounds.length:0;}, get remaining(){return queue.length+zombies.length;}, get zcount(){return zombies.length;} };
   return {};
 })();
 
