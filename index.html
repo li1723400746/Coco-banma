@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0b1b3a">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏎️</text></svg>">
+<meta name="description" content="汽车专业英语 · 发动机基本概念与运行原理 —— 交互式双语动画课程：单词发音、爆炸图、四冲程动画、单词大作战小游戏。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="汽车专业英语 · 发动机基本概念与运行原理">
+<meta property="og:description" content="交互式双语动画课程 · 单词发音 · 爆炸图 · 四冲程动画 · 单词大作战游戏">
+<meta property="og:site_name" content="汽车专业英语 · 授课人：孔梦琳">
+<meta name="twitter:card" content="summary">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>汽车专业英语 · 授课人：孔梦琳 · 发动机基本概念与运行原理 | 交互式双语动画课程</title>
 <style>
 /* ============ 基础与变量 ============ */
@@ -336,6 +344,76 @@ footer b{color:#cfe0ff}
 .win-sub{font-size:20px;color:#fbbf24;font-weight:800}
 @media(max-width:560px){.plant-card{font-size:13px;padding:6px 12px;min-width:60px}}
 
+/* ============ A/B 视觉·动效升级 ============ */
+/* 主题切换按钮 */
+.theme-btn{position:fixed;top:52px;right:14px;z-index:960;width:40px;height:40px;border-radius:50%;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.25s}
+.theme-btn:hover{transform:rotate(18deg) scale(1.1)}
+/* 渐变背景光斑 */
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(90px);opacity:.45;pointer-events:none}
+body::before{width:440px;height:440px;background:radial-gradient(circle,#38bdf8 0%,transparent 70%);top:-140px;left:-140px}
+body::after{width:480px;height:480px;background:radial-gradient(circle,#fbbf24 0%,transparent 70%);bottom:-160px;right:-160px}
+/* 玻璃拟态 */
+.card{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(255,255,255,.8)}
+nav.tabs{background:rgba(255,255,255,.68);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+/* 深色主题 */
+[data-theme="dark"]{
+  --bg:#0a111f; --card:#121c31; --ink:#e5ecf9; --muted:#94a7cc; --line:#25324e;
+  --primary:#3b82f6; --primary-d:#60a5fa; --primary-l:#1c2c4e;
+  --accent:#fbbf24; --accent-l:#3a2f14;
+  --shadow:0 12px 32px rgba(0,0,0,.45);
+}
+[data-theme="dark"] body{background:var(--bg)}
+[data-theme="dark"] .card{background:rgba(18,28,49,.85)}
+[data-theme="dark"] nav.tabs{background:rgba(10,17,31,.7);border-bottom-color:#25324e}
+[data-theme="dark"] nav.tabs a{color:var(--muted)}
+[data-theme="dark"] nav.tabs a.active{background:var(--primary);color:#fff}
+[data-theme="dark"] .qa-card{background:linear-gradient(160deg,#12213f,#121c31);border-color:#25324e}
+[data-theme="dark"] .reading{background:linear-gradient(180deg,#121c31,#101a2d);border-left-color:var(--primary)}
+[data-theme="dark"] .reading .zh-text{background:#0c2f2b;border-color:#14524c;color:#7fe0d0}
+[data-theme="dark"] .tip{background:#2b2410;border-color:#6b5416;color:#fcd34d}
+[data-theme="dark"] .q-card{background:var(--card)}
+[data-theme="dark"] .q-opt{background:#18233b;border-color:#2a3a5c;color:var(--ink)}
+[data-theme="dark"] .q-opt:hover:not(:disabled){background:#1e2c48}
+[data-theme="dark"] .vocab-table{background:#121c31}
+[data-theme="dark"] .vocab-table th{background:#18233b;color:#9ec1ff}
+[data-theme="dark"] .vocab-table td{border-color:#1f2b44}
+[data-theme="dark"] .vocab-table tr:hover{background:#1a2742}
+[data-theme="dark"] .flash-face.back{background:#121c31;border-color:var(--primary)}
+[data-theme="dark"] .tab-switch{background:#1a2742}
+[data-theme="dark"] .tab-switch button.on{background:#2b3b5e;color:#dbe7ff}
+[data-theme="dark"] .arr-tab{background:#18233b;color:var(--muted);border-color:#2a3a5c}
+[data-theme="dark"] .mind-detail{background:#121c31}
+[data-theme="dark"] .mind-scroll{background:linear-gradient(180deg,#121c31,#0f1830)}
+[data-theme="dark"] .cyl-info{background:#121c31}
+[data-theme="dark"] .diff-btn{background:#18233b;color:var(--muted);border-color:#2a3a5c}
+[data-theme="dark"] .pick-card{background:linear-gradient(120deg,#2b1d0a,#2b2410);border-color:#6b5416}
+[data-theme="dark"] .pick-note{color:#fcd34d}
+[data-theme="dark"] .q-feedback.ok{background:#0c2f1c;border-color:#14532d;color:#86efac}
+[data-theme="dark"] .q-feedback.no{background:#3a1414;border-color:#7f1d1d;color:#fca5a5}
+[data-theme="dark"] .stage-note{color:#94a7cc}
+[data-theme="dark"] .mind-detail .dt{color:#60a5fa}
+[data-theme="dark"] #mindSvg{background:#121c31}
+[data-theme="dark"] .hero .meta span{background:rgba(255,255,255,.08)}
+/* 滚动渐显 */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+/* 翻页入场动画 */
+.page-enter{animation:pageEnter .5s cubic-bezier(.22,1,.36,1)}
+@keyframes pageEnter{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+/* 微交互 */
+.btn:active{transform:scale(.96)}
+.card{transition:box-shadow .3s,transform .3s}
+.card:hover{box-shadow:0 16px 40px rgba(23,43,86,.14)}
+[data-theme="dark"] .card:hover{box-shadow:0 16px 40px rgba(0,0,0,.5)}
+@media(max-width:900px){.theme-btn{top:auto;bottom:68px}}
+@media(prefers-reduced-motion:reduce){.reveal,.page-enter{transition:none;animation:none;opacity:1;transform:none}}
+/* 拼写题 */
+.q-type.spell{background:#0d9488}
+.q-spell{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.q-spell input{flex:1;min-width:180px;padding:12px 16px;font-size:16px;font-weight:700;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);outline:none;transition:.2s;font-family:var(--font)}
+.q-spell input:focus{border-color:var(--primary)}
+.spell-hint{margin-top:10px;font-size:13px;color:var(--muted);font-weight:600}
+
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -345,7 +423,7 @@ footer b{color:#cfe0ff}
 <div id="progressBar"></div>
 
 <!-- 导航 -->
-<nav class="tabs" id="topTabs">
+<nav class="tabs" id="topTabs" aria-label="课程章节导航">
   <div class="inner" id="tabInner">
     <a href="#sec-intro" data-sec="sec-intro"><span class="num">01</span>导入</a>
     <a href="#sec-vocab" data-sec="sec-vocab"><span class="num">02</span>单词短语</a>
@@ -358,6 +436,7 @@ footer b{color:#cfe0ff}
     <a href="#sec-mindmap" data-sec="sec-mindmap"><span class="num">09</span>知识总结</a>
   </div>
 </nav>
+<button class="theme-btn" id="themeBtn" title="切换深色/浅色主题">🌙</button>
 
 <div id="pages" class="pages">
 <!-- ========== 01 导入（第 1 页：封面 + 导入） ========== -->
@@ -459,6 +538,10 @@ footer b{color:#cfe0ff}
     <p class="en-text" style="margin-top:8px"><span class="hl">Engine</span> is called the <span class="hl">"heart"</span> of an automobile. It's in <span class="hl">direct relation</span> to the <span class="hl">power take-off</span> and <span class="hl">smoothness</span> of an automobile.</p>
     <div class="zh-text">发动机被称为汽车的<b>"心脏"</b>。它与汽车的<b>动力输出</b>和<b>平稳性</b>有着直接的关系。</div>
     <p class="tip" style="margin-top:12px">🔍 <span><b>power take-off</b>（动力输出）= 发动机通过曲轴向外传递的动力；<b>smoothness</b>（平稳性）= 运转是否顺畅、不抖动。</span></p>
+  </div>
+  <div class="card">
+    <h3>🔧 扩展词汇 · 故障与保养 <span class="en">Extra Vocabulary — Troubles &amp; Maintenance</span></h3>
+    <div class="grid3" id="extraVocab"></div>
   </div>
 </div></section>
 
@@ -585,7 +668,7 @@ footer b{color:#cfe0ff}
       <button class="btn" id="btnGameStart">▶ 开始游戏</button>
     </div>
     <div id="gameBox" class="game-box">
-      <canvas id="gameCanvas" width="640" height="360"></canvas>
+      <canvas id="gameCanvas" width="640" height="360" aria-label="单词大作战游戏画布"></canvas>
       <div id="gamePlants" class="game-plants" style="display:none"></div>
       <div id="gameOver" class="game-overlay" style="display:none">
         <div class="dead-char">菜</div>
@@ -643,7 +726,7 @@ flowchart TB
   <footer>
     <p><b>汽车专业英语 · 发动机基本概念与运行原理</b> — 交互式双语动画课程</p>
     <p style="margin-top:4px">Engine is called the "heart" of an automobile. ❤️ 发动机被称为汽车的"心脏"</p>
-    <p style="margin-top:10px;font-size:12.5px;color:#7f9bd0">👥 本站访客 <span id="busuanzi_value_site_uv"></span> 人 · 累计浏览 <span id="busuanzi_value_site_pv"></span> 次</p>
+    <p style="margin-top:10px;font-size:12.5px;color:#7f9bd0">📖 <span id="progressText">已学 1/9 页</span> · 👥 本站访客 <span id="busuanzi_value_site_uv"></span> 人 · 累计浏览 <span id="busuanzi_value_site_pv"></span> 次</p>
     <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
   </footer>
 </div>
@@ -855,6 +938,10 @@ const QUESTIONS=[
   a:false,exp:'柴油机没有点火系统，靠压缩自燃（压燃）。'},
  {ty:'tf',q:'活塞在气缸内做直线往复运动。',en:'The piston moves linearly (up and down) in the cylinder.',
   a:true,exp:'动力由活塞在气缸内做直线运动产生，曲轴再把它转为旋转运动。'},
+ {ty:'spell',q:'「发动机」的英文拼写是？',en:'Spell the English word for 发动机.',hint:'e____（7 个字母）',a:'engine',exp:"engine ['endʒɪn] n.发动机"},
+ {ty:'spell',q:'「活塞」的英文拼写是？',en:'Spell the English word for 活塞.',hint:'p____（6 个字母）',a:'piston',exp:"piston ['pɪstən] n.活塞"},
+ {ty:'spell',q:'「气缸」的英文拼写是？',en:'Spell the English word for 气缸.',hint:'c______（8 个字母）',a:'cylinder',exp:"cylinder ['sɪlɪndə(r)] n.气缸"},
+ {ty:'spell',q:'「点火」的英文拼写是？',en:'Spell the English word for 点火.',hint:'i______（8 个字母）',a:'ignition',exp:"ignition [ɪɡ'nɪʃn] n.点火"},
 ];
 
 /* ---------- 数据：思维导图知识树 ---------- */
@@ -897,6 +984,33 @@ const TREE={
  ]
 };
 
+/* ---------- 主题切换（深色/浅色） ---------- */
+(function(){
+  const btn=$('#themeBtn');
+  let saved=null;
+  try{ saved=localStorage.getItem('dse-theme'); }catch(e){}
+  const sys=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  let theme=saved||sys;
+  function apply(t){
+    theme=t;
+    document.documentElement.setAttribute('data-theme', t);
+    if(btn)btn.textContent=t==='dark'?'☀️':'🌙';
+    try{ localStorage.setItem('dse-theme', t); }catch(e){}
+  }
+  apply(theme);
+  if(btn)btn.addEventListener('click',()=>apply(theme==='dark'?'light':'dark'));
+})();
+
+/* ---------- 滚动渐显（页内内容） ---------- */
+function initReveal(){
+  const els=document.querySelectorAll('.page-inner > *');
+  els.forEach(el=>el.classList.add('reveal'));
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:.05});
+  els.forEach(el=>io.observe(el));
+}
+
 /* ---------- 左右翻页 ---------- */
 const PAGES=['sec-intro','sec-vocab','sec-reading','sec-explode','sec-systems','sec-cylinders','sec-four','sec-quiz','sec-mindmap'];
 const progBar=$('#progressBar'), tabLinks=$$('#topTabs a');
@@ -915,8 +1029,21 @@ function goTo(i,instant){
   const bp=$('#btnPrev'), bn=$('#btnNext'); if(bp)bp.disabled=curPage===0; if(bn)bn.disabled=curPage===PAGES.length-1;
   const ap=$('#arrowPrev'), an=$('#arrowNext'); if(ap)ap.disabled=curPage===0; if(an)an.disabled=curPage===PAGES.length-1;
   $$('#pageDots i').forEach((d,idx)=>d.classList.toggle('on',idx===curPage));
-  const pe=$('#'+PAGES[curPage]); if(pe)pe.scrollTop=0;
+  const pe=$('#'+PAGES[curPage]);
+  if(pe){
+    pe.scrollTop=0;
+    const inner=pe.querySelector('.page-inner');
+    if(inner){ inner.classList.remove('page-enter'); void inner.offsetWidth; inner.classList.add('page-enter'); }
+  }
   if(PAGES[curPage]==='sec-four'&&window.__FOUR&&window.__FOUR.autoplay)window.__FOUR.autoplay();
+  /* 学习进度记录 */
+  try{
+    const learned=JSON.parse(localStorage.getItem('dse-learned')||'{}');
+    learned[PAGES[curPage]]=1;
+    localStorage.setItem('dse-learned', JSON.stringify(learned));
+    const n=Object.keys(learned).length;
+    const pt=$('#progressText'); if(pt)pt.textContent='已学 '+n+'/'+PAGES.length+' 页';
+  }catch(e){}
 }
 tabLinks.forEach(a=>a.addEventListener('click',e=>{
   e.preventDefault();
@@ -1024,7 +1151,7 @@ $$('.tab-switch button').forEach(b=>b.addEventListener('click',()=>{
 }));
 setVocabMode('table');
 
-/* ---------- 课文 1 渲染 ---------- */
+/* ---------- 课文 1 渲染 + 句子朗读 + 扩展词汇 ---------- */
 (function(){
   const en1='<span class="hl">Engine</span> is called the <span class="hl">"heart"</span> of an automobile. It\'s in <span class="hl">direct relation</span> to the <span class="hl">power take-off</span> and <span class="hl">smoothness</span> of an automobile. Let\'s read about the <span class="hl">engines</span>.';
   const zh1='发动机被称为汽车的<b>"心脏"</b>。它与汽车<b>动力输出</b>和<b>平稳性</b>有着直接的关系。下面让我们来学习更多有关于发动机的知识。';
@@ -1038,6 +1165,31 @@ setVocabMode('table');
     btn.textContent=hidden?'🙈 隐藏中文翻译':'👀 显示中文翻译';
   });
   card1.querySelector('h3').appendChild(btn);
+  /* 朗读课文 */
+  const speakBtn=document.createElement('button'); speakBtn.className='tgl-btn'; speakBtn.textContent='🔊 朗读课文';
+  speakBtn.style.marginLeft='8px';
+  speakBtn.addEventListener('click',()=>{
+    if(!('speechSynthesis'in window)){ toast('当前浏览器不支持朗读'); return; }
+    speechSynthesis.cancel();
+    const text='Engine is called the heart of an automobile. It is in direct relation to the power take-off and smoothness of an automobile. Let us read about the engines.';
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US'; u.rate=.9;
+    const v=voices.find(x=>x.lang&&x.lang.toLowerCase().startsWith('en'));
+    if(v)u.voice=v;
+    speechSynthesis.speak(u);
+  });
+  card1.querySelector('h3').appendChild(speakBtn);
+  /* 扩展词汇（故障与保养） */
+  const EXTRA=[
+    {en:'overheat',zh:'过热'},{en:'oil leak',zh:'漏油'},{en:'coolant',zh:'冷却液'},
+    {en:'spark',zh:'火花'},{en:'fuel consumption',zh:'油耗'},{en:'maintenance',zh:'保养'},
+    {en:'repair',zh:'维修'},{en:'wear',zh:'磨损'},{en:'abnormal noise',zh:'异响'},{en:'start',zh:'启动'}
+  ];
+  const box=$('#extraVocab');
+  if(box){
+    box.innerHTML=EXTRA.map(v=>`<div class="qa-card" style="padding:12px 14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div><div style="font-weight:800;font-size:15px">${v.en}</div><div style="font-size:13px;color:var(--primary-d)">${v.zh}</div></div><button class="speak-btn" data-t="${v.en}" data-l="en-US">🔊</button></div></div>`).join('');
+    box.querySelectorAll('.speak-btn').forEach(b=>bindSpeak(b,b.dataset.t,'en-US'));
+  }
 })();
 
 /* ================================================================
@@ -1667,7 +1819,13 @@ function buildQuiz(){
       $('#qBack').addEventListener('click',()=>{ if(window.__PAGES)window.__PAGES.goTo(6); });
       return;
     }
-    const q=QUESTIONS[qi], isTF=q.ty==='tf';
+    const q=QUESTIONS[qi], isTF=q.ty==='tf', isSpell=q.ty==='spell';
+    const typeLabel=isTF?'判断题 TRUE / FALSE':(isSpell?'拼写题 SPELLING':'选择题 MULTIPLE CHOICE');
+    const optsHtml=isTF
+      ? '<div class="q-opt" data-v="1"><span class="k">✓</span>True</div><div class="q-opt" data-v="0"><span class="k">✗</span>False</div>'
+      : (isSpell
+        ? '<div class="q-spell"><input id="spellInput" type="text" placeholder="输入英文单词…" autocomplete="off" spellcheck="false"><button class="btn" id="spellSubmit">提交</button></div>'
+        : q.opts.map((o,i)=>`<div class="q-opt" data-v="${i}"><span class="k">${String.fromCharCode(65+i)}</span>${o}</div>`).join(''));
     box.innerHTML=`
       <div class="pick-card">
         <span class="p-label">🎲 点名回答</span>
@@ -1676,11 +1834,9 @@ function buildQuiz(){
         <div class="pick-note">${picked?'当前被点名回答本题的是 <b>'+picked+'</b>，请作答；答完会显示他的表现。':'点击"抽人回答"，随机抽取一名同学（左1~左8）来回答本题。'}</div>
       </div>
       <div class="q-card">
-        <span class="q-type ${isTF?'tf':''}">${isTF?'判断题 TRUE / FALSE':'选择题 MULTIPLE CHOICE'} · 第 ${qi+1} 题</span>
-        <div class="q-text">${q.q}<br><span class="en2">${q.en}</span></div>
-        <div class="q-opts">${isTF
-          ? '<div class="q-opt" data-v="1"><span class="k">✓</span>True</div><div class="q-opt" data-v="0"><span class="k">✗</span>False</div>'
-          : q.opts.map((o,i)=>`<div class="q-opt" data-v="${i}"><span class="k">${String.fromCharCode(65+i)}</span>${o}</div>`).join('')}</div>
+        <span class="q-type ${isTF?'tf':''} ${isSpell?'spell':''}">${typeLabel} · 第 ${qi+1} 题</span>
+        <div class="q-text">${q.q}<br><span class="en2">${q.en}</span>${isSpell?'<div class="spell-hint">提示：'+q.hint+'</div>':''}</div>
+        <div class="q-opts">${optsHtml}</div>
         <div class="q-feedback" id="qFb"></div>
         <div class="q-nav">
           <span class="q-score">已答 <b id="qAn">${answered}</b>/${QUESTIONS.length} · 得分 <b id="qSc">${score}</b></span>
@@ -1688,19 +1844,33 @@ function buildQuiz(){
         </div>
       </div>`;
     $('#btnPick').addEventListener('click',()=>pickStudent());
-    box.querySelectorAll('.q-opt').forEach(opt=>opt.addEventListener('click',()=>{
-      if(opt.classList.contains('locked'))return;
-      const v=Number(opt.dataset.v), right=isTF?(q.a?1:0):q.a, ok=v===right;
+    const finish=(ok)=>{
       if(ok)score++; answered++;
-      opt.classList.add(ok?'correct':'wrong');
-      const ro=box.querySelector('.q-opt[data-v="'+right+'"]'); if(ro)ro.classList.add('correct');
-      box.querySelectorAll('.q-opt').forEach(o=>o.classList.add('locked'));
       const fb=$('#qFb'); fb.className='q-feedback show '+(ok?'ok':'no');
       fb.innerHTML='<b>🎤 '+(picked?picked+' ':'')+(ok?'回答正确！':'回答错误。')+'</b> 解析：'+q.exp;
       $('#qBar').style.width=(answered/QUESTIONS.length*100)+'%';
       $('#qAn').textContent=answered; $('#qSc').textContent=score;
       $('#qNext').style.display='inline-flex';
-    }));
+    };
+    if(isSpell){
+      $('#spellSubmit').addEventListener('click',()=>{
+        const input=$('#spellInput');
+        const ok=input.value.trim().toLowerCase()===q.a.toLowerCase();
+        input.disabled=true; input.style.borderColor=ok?'var(--good)':'var(--bad)';
+        $('#spellSubmit').disabled=true;
+        finish(ok);
+      });
+      $('#spellInput').addEventListener('keydown',e=>{ if(e.key==='Enter')$('#spellSubmit').click(); });
+    }else{
+      box.querySelectorAll('.q-opt').forEach(opt=>opt.addEventListener('click',()=>{
+        if(opt.classList.contains('locked'))return;
+        const v=Number(opt.dataset.v), right=isTF?(q.a?1:0):q.a, ok=v===right;
+        opt.classList.add(ok?'correct':'wrong');
+        const ro=box.querySelector('.q-opt[data-v="'+right+'"]'); if(ro)ro.classList.add('correct');
+        box.querySelectorAll('.q-opt').forEach(o=>o.classList.add('locked'));
+        finish(ok);
+      }));
+    }
     $('#qNext').addEventListener('click',()=>{ qi++; if(qi>=QUESTIONS.length)done=true; render(); });
   }
   render();
@@ -2150,11 +2320,16 @@ const GAME=(function(){
 })();
 
 /* ================= 初始化 ================= */
+initReveal();
 buildExplode();
 buildSystems();
 buildCylinders();
 buildQuiz();
 buildMindmap();
+/* PWA：注册 Service Worker（离线缓存） */
+if('serviceWorker'in navigator && location.protocol==='https:'){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); });
+}
 
 </script>
 </body>
