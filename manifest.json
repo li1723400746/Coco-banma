@@ -1,0 +1,13 @@
+{
+  "name": "汽车专业英语 · 发动机基本概念与运行原理",
+  "short_name": "汽车英语",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a111f",
+  "theme_color": "#0b1b3a",
+  "description": "发动机基本概念与运行原理 · 交互式双语动画课程",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
