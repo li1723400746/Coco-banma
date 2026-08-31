@@ -532,10 +532,14 @@ nav.tabs{background:rgba(255,255,255,.68);backdrop-filter:blur(18px);-webkit-bac
     <div class="card video-card">
       <h3>🎬 单词视频讲解 <span class="en">Video Lesson</span></h3>
       <div class="video-frame">
-        <iframe src="https://player.bilibili.com/player.html?bvid=BV1LHt86mETE&page=1&high_quality=1&danmaku=0" scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true" allow="fullscreen; autoplay; encrypted-media" style="width:100%;aspect-ratio:16/9;border:none;border-radius:12px;background:#000"></iframe>
+        <video controls preload="metadata" playsinline style="width:100%;aspect-ratio:16/9;border-radius:12px;background:#000">
+          <source src="https://cdn.jsdelivr.net/gh/li1723400746/Coco-banma@main/video/shipin2.mp4" type="video/mp4">
+          <source src="video/shipin2.mp4" type="video/mp4">
+          您的浏览器不支持 HTML5 视频播放。
+        </video>
         <button class="fullscreen-btn" id="btnFullscreen" title="全屏播放">⛶</button>
       </div>
-      <p class="stage-note" style="margin-top:8px">视频由 B 站提供，画质高清、加载流畅。点击右下角 ⛶ 可全屏播放。</p>
+      <p class="stage-note" style="margin-top:8px">高清 1080p 视频 · 国内 CDN 加速 · 无需登录。</p>
     </div>
   </div>
 </div></section>
@@ -1026,7 +1030,7 @@ const TREE={
   const btn=$('#btnFullscreen');
   if(!btn)return;
   btn.addEventListener('click',()=>{
-    const f=document.querySelector('.video-frame iframe');
+    const f=document.querySelector('.video-frame iframe, .video-frame video');
     if(!f)return;
     if(document.fullscreenElement){
       if(document.exitFullscreen)document.exitFullscreen();
