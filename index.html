@@ -417,6 +417,9 @@ nav.tabs{background:rgba(255,255,255,.68);backdrop-filter:blur(18px);-webkit-bac
 .vocab-layout{display:grid;grid-template-columns:1fr 380px;gap:16px;align-items:start}
 .video-card{position:sticky;top:70px}
 .video-card video{width:100%;border-radius:12px;background:#000;display:block;aspect-ratio:16/9;object-fit:contain}
+.video-frame{position:relative}
+.video-frame .fullscreen-btn{position:absolute;right:10px;bottom:10px;width:38px;height:38px;border-radius:9px;background:rgba(0,0,0,.62);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;z-index:5;transition:.2s}
+.video-frame .fullscreen-btn:hover{background:rgba(0,0,0,.85)}
 @media(max-width:900px){.vocab-layout{grid-template-columns:1fr}.video-card{position:static}}
 
 @media(prefers-reduced-motion:reduce){
@@ -528,8 +531,11 @@ nav.tabs{background:rgba(255,255,255,.68);backdrop-filter:blur(18px);-webkit-bac
     </div>
     <div class="card video-card">
       <h3>🎬 单词视频讲解 <span class="en">Video Lesson</span></h3>
-      <iframe src="https://player.bilibili.com/player.html?bvid=BV1LHt86mETE&page=1&high_quality=1&danmaku=0" scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%;aspect-ratio:16/9;border:none;border-radius:12px;background:#000"></iframe>
-      <p class="stage-note" style="margin-top:8px">视频由 B 站提供，画质高清、加载流畅。</p>
+      <div class="video-frame">
+        <iframe src="https://player.bilibili.com/player.html?bvid=BV1LHt86mETE&page=1&high_quality=1&danmaku=0" scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true" allow="fullscreen; autoplay; encrypted-media" style="width:100%;aspect-ratio:16/9;border:none;border-radius:12px;background:#000"></iframe>
+        <button class="fullscreen-btn" id="btnFullscreen" title="全屏播放">⛶</button>
+      </div>
+      <p class="stage-note" style="margin-top:8px">视频由 B 站提供，画质高清、加载流畅。点击右下角 ⛶ 可全屏播放。</p>
     </div>
   </div>
 </div></section>
@@ -1013,6 +1019,23 @@ const TREE={
   }
   apply(theme);
   if(btn)btn.addEventListener('click',()=>apply(theme==='dark'?'light':'dark'));
+})();
+
+/* ---------- 视频全屏 ---------- */
+(function(){
+  const btn=$('#btnFullscreen');
+  if(!btn)return;
+  btn.addEventListener('click',()=>{
+    const f=document.querySelector('.video-frame iframe');
+    if(!f)return;
+    if(document.fullscreenElement){
+      if(document.exitFullscreen)document.exitFullscreen();
+      else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+    }else{
+      if(f.requestFullscreen)f.requestFullscreen().catch(()=>{});
+      else if(f.webkitRequestFullscreen)f.webkitRequestFullscreen();
+    }
+  });
 })();
 
 /* ---------- 滚动渐显（页内内容） ---------- */
